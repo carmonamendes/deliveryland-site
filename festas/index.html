@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kit Festas & Arcos — Locação de Kits de Festa</title>
+<meta name="description" content="Alugue kits de festa completos com montagem e arcos de balão. Escolha a data na agenda, calcule entrega e pague com Pix ou cartão.">
+<meta name="theme-color" content="#E86A5C">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --coral: #E86A5C; --coral-dark: #cf5346; --cream: #FFF8F3; --ink: #2f2a28;
+    --muted: #8a807b; --card: #ffffff; --line: #f0e4db; --green: #25D366;
+    --green-dark: #1da851; --ok: #1da851; --soft: #fff2ee;
+  }
+  html, body { background: var(--cream); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.45; }
+  .wrap { max-width: 900px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+  header { padding: 20px 20px 14px; position: sticky; top: 0; background: var(--cream); z-index: 10; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .logo { font-size: 26px; }
+  .kicker { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--coral); font-weight: 700; }
+  h1 { font-size: 20px; margin-top: 1px; }
+  main { flex: 1; padding: 18px 20px 40px; }
+  .hidden { display: none !important; }
+
+  /* catálogo */
+  .lead { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .kit { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04); display: flex; flex-direction: column; }
+  .kit-img { aspect-ratio: 4/3; background: #f3e7de center/cover no-repeat; display:flex; align-items:center; justify-content:center; font-size:42px; color:#d8b7a6; }
+  .kit-body { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .kit-tema { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--coral); font-weight: 700; }
+  .kit-nome { font-size: 17px; font-weight: 800; }
+  .kit-desc { font-size: 13px; color: var(--muted); flex: 1; }
+  .kit-preco { font-size: 15px; font-weight: 700; margin-top: 4px; }
+  .kit-preco small { font-weight: 500; color: var(--muted); }
+
+  /* botões */
+  button { font-family: inherit; font-size: 15px; font-weight: 700; border: none; border-radius: 13px; padding: 13px 16px; cursor: pointer; transition: transform .06s, background .15s; }
+  button:active { transform: scale(.98); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary { background: var(--coral); color: #fff; width: 100%; }
+  .btn-primary:hover:not(:disabled) { background: var(--coral-dark); }
+  .btn-ghost { background: #fff; color: var(--muted); border: 1.5px solid var(--line); }
+  .btn-wa { background: var(--green); color: #fff; display:flex; align-items:center; justify-content:center; gap:8px; width:100%; }
+  .btn-copy { background: var(--ink); color: #fff; width: 100%; }
+
+  /* reserva */
+  .back { display:inline-flex; align-items:center; gap:6px; color: var(--muted); font-size: 14px; font-weight:600; background:none; padding: 4px 0; margin-bottom: 8px; }
+  .booking { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 720px){ .booking { grid-template-columns: 1fr 320px; align-items: start; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+  .card h3 { font-size: 15px; margin-bottom: 12px; }
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  label.lbl { display:block; font-weight: 700; font-size: 13.5px; margin-bottom: 5px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  input, select { width: 100%; border: 1.5px solid var(--line); border-radius: 11px; padding: 11px 12px; font-size: 16px; font-family: inherit; color: var(--ink); background: #fffdfb; }
+  input:focus, select:focus { outline: none; border-color: var(--coral); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* calendário */
+  .cal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
+  .cal-head strong { font-size: 15px; text-transform: capitalize; }
+  .cal-nav { background: var(--soft); color: var(--coral); border-radius: 10px; width: 36px; height: 36px; padding: 0; font-size: 18px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .cal-dow { text-align:center; font-size: 11px; color: var(--muted); font-weight: 700; padding: 4px 0; }
+  .cal-day { aspect-ratio: 1; display:flex; align-items:center; justify-content:center; border-radius: 10px; font-size: 14px; border: 1.5px solid transparent; background: #fffdfb; cursor: pointer; }
+  .cal-day.empty { background: transparent; cursor: default; }
+  .cal-day.off { color: #c9beb6; text-decoration: line-through; cursor: not-allowed; background: #f7efe8; }
+  .cal-day.free:hover { border-color: var(--coral); }
+  .cal-day.sel { background: var(--coral); color:#fff; font-weight: 800; }
+
+  .opts { display:flex; flex-direction: column; gap: 8px; }
+  .opt { display:flex; align-items:center; gap: 10px; border: 1.5px solid var(--line); border-radius: 11px; padding: 11px 12px; cursor:pointer; font-size: 14px; background:#fffdfb; }
+  .opt.on { border-color: var(--coral); background: var(--soft); }
+  .opt .dot { width:18px; height:18px; border-radius:50%; border: 2px solid #d8ccc3; flex-shrink:0; position:relative; }
+  .opt.on .dot::after { content:''; position:absolute; inset:3px; background: var(--coral); border-radius:50%; }
+  .switch { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .switch small { color: var(--muted); font-size: 12px; display:block; }
+  .toggle { width:46px; height:27px; border-radius:99px; background:#e0d3c8; position:relative; transition:.2s; flex-shrink:0; }
+  .toggle.on { background: var(--coral); }
+  .toggle::after { content:''; position:absolute; top:3px; left:3px; width:21px; height:21px; border-radius:50%; background:#fff; transition:.2s; }
+  .toggle.on::after { left:22px; }
+
+  /* resumo lateral */
+  .summary { position: sticky; top: 92px; }
+  .sumline { display:flex; justify-content:space-between; font-size: 14px; padding: 6px 0; }
+  .sumline.total { border-top: 1.5px dashed var(--line); margin-top: 6px; padding-top: 12px; font-size: 18px; font-weight: 800; }
+  .sumline .muted { color: var(--muted); }
+  .badge { display:inline-block; font-size: 11px; font-weight:700; color: var(--coral); background: var(--soft); padding: 3px 9px; border-radius: 99px; }
+
+  /* pagamento */
+  .pay-wrap { max-width: 520px; margin: 0 auto; text-align:center; }
+  .pay-emoji { font-size: 46px; }
+  .pix-code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; word-break: break-all; background: #fffdfb; border: 1.5px solid var(--line); border-radius: 12px; padding: 12px; text-align:left; max-height: 130px; overflow:auto; margin: 12px 0; }
+  .steps { text-align:left; font-size: 13.5px; color: var(--muted); margin: 10px 0 16px; padding-left: 18px; }
+  .steps li { margin-bottom: 4px; }
+  .alert { background: #fdecea; color: #a3271b; border: 1px solid #f5c6c0; border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 14px; text-align:left; }
+  .spin { display:inline-block; width:20px; height:20px; border:3px solid var(--line); border-top-color: var(--coral); border-radius:50%; animation: sp 1s linear infinite; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+  .center { text-align:center; padding: 40px 0; color: var(--muted); }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color:#fff; padding: 11px 20px; border-radius: 99px; font-size: 14px; opacity:0; transition: opacity .25s; pointer-events:none; z-index: 50; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="logo">🎈</span>
+      <div>
+        <div class="kicker">Locação</div>
+        <h1 id="brandName">Kit Festas &amp; Arcos</h1>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <div class="center"><span class="spin"></span><div style="margin-top:10px">Carregando kits…</div></div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+  const CFG = window.FESTAS_CONFIG || {};
+  const API = (path) => (CFG.N8N_BASE || '').replace(/\/$/,'') + path;
+  const main = document.getElementById('main');
+  const toastEl = document.getElementById('toast');
+  document.getElementById('brandName').textContent = CFG.NOME_NEGOCIO || 'Kit Festas & Arcos';
+
+  const state = {
+    kits: [], indisponiveis: new Set(), taxas: { montagem:0, entrega_base:0, entrega_km:0 },
+    antecedencia: 2, kit: null, data: null, periodo: 'dia', montagem: false,
+    distancia: 0, calCursor: null, metodo: 'pix'
+  };
+
+  const money = (n) => 'R$ ' + (Number(n)||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const esc = (s) => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'), 2000); }
+
+  // ── Carregar catálogo ────────────────────────────────────────
+  async function load(){
+    if (!CFG.N8N_BASE || CFG.N8N_BASE.includes('SEU_N8N')) {
+      main.innerHTML = `<div class="alert">⚙️ Configure a URL do n8n em <b>festas/config.js</b> (campo <code>N8N_BASE</code>) para o catálogo carregar.</div>`;
+      renderCatalog(); // mostra vazio/estrutura
+      return;
+    }
+    try {
+      const res = await fetch(API(CFG.ENDPOINTS.catalogo), { method: 'GET' });
+      const data = await res.json();
+      state.kits = data.kits || [];
+      state.indisponiveis = new Set((data.datas_indisponiveis || []).map(d => String(d).slice(0,10)));
+      if (data.taxas) state.taxas = data.taxas;
+      state.antecedencia = data.antecedencia_min_dias || 2;
+      renderCatalog();
+    } catch (e) {
+      main.innerHTML = `<div class="alert">Não foi possível carregar os kits agora. Tente novamente em instantes.</div>
+        <button class="btn-primary" onclick="location.reload()">Recarregar</button>`;
+    }
+  }
+
+  // ── Catálogo ─────────────────────────────────────────────────
+  function renderCatalog(){
+    const cards = state.kits.map(k => `
+      <div class="kit">
+        <div class="kit-img" ${k.imagem_url ? `style="background-image:url('${esc(k.imagem_url)}')"` : ''}>${k.imagem_url ? '' : '🎉'}</div>
+        <div class="kit-body">
+          ${k.tema ? `<div class="kit-tema">${esc(k.tema)}</div>` : ''}
+          <div class="kit-nome">${esc(k.nome)}</div>
+          <div class="kit-desc">${esc(k.descricao || '')}</div>
+          <div class="kit-preco">${money(k.preco_locacao)} <small>/ locação</small></div>
+          <button class="btn-primary" data-kit="${esc(k.id)}" style="margin-top:8px">Reservar</button>
+        </div>
+      </div>`).join('');
+    main.innerHTML = `
+      <p class="lead">Escolha um kit, veja a disponibilidade na agenda e reserve com Pix ou cartão. Entrega e montagem opcionais.</p>
+      ${state.kits.length ? `<div class="grid">${cards}</div>` : `<div class="center">Nenhum kit disponível no momento.</div>`}`;
+    main.querySelectorAll('[data-kit]').forEach(b => b.onclick = () => openKit(b.dataset.kit));
+  }
+
+  // ── Reserva ──────────────────────────────────────────────────
+  function openKit(id){
+    state.kit = state.kits.find(k => String(k.id) === String(id));
+    if (!state.kit) return;
+    state.data = null; state.periodo = 'dia'; state.montagem = false; state.distancia = 0; state.metodo = 'pix';
+    const now = new Date();
+    state.calCursor = new Date(now.getFullYear(), now.getMonth(), 1);
+    renderBooking();
+  }
+
+  function renderBooking(){
+    const k = state.kit;
+    const itens = (k.itens || []).map(i => `<li>${esc(i)}</li>`).join('');
+    main.innerHTML = `
+      <button class="back" id="back">← Voltar aos kits</button>
+      <div class="booking">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="kit-tema">${esc(k.tema||'')}</div>
+            <div style="font-size:20px;font-weight:800;margin:2px 0 6px">${esc(k.nome)}</div>
+            <div class="kit-desc">${esc(k.descricao||'')}</div>
+            ${itens ? `<ul class="steps" style="margin-top:8px">${itens}</ul>` : ''}
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <h3>1. Escolha a data</h3>
+            <div id="cal"></div>
+            <div class="hint">Datas riscadas já estão reservadas. Reserve com no mínimo ${state.antecedencia} dia(s) de antecedência.</div>
+            <div class="field" style="margin-top:12px">
+              <label class="lbl">Período</label>
+              <select id="periodo">
+                <option value="dia">Dia todo</option>
+                <option value="manha">Manhã</option>
+                <option value="tarde">Tarde</option>
+                <option value="noite">Noite</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <h3>2. Entrega e montagem</h3>
+            <div class="field switch">
+              <div><b style="font-size:14px">Quero montagem no local</b><small>+ ${money(state.taxas.montagem)} — a gente monta e desmonta pra você.</small></div>
+              <div class="toggle" id="tgMontagem"></div>
+            </div>
+            <div class="field">
+              <label class="lbl">Distância aproximada até o evento (km)</label>
+              <input type="number" id="distancia" min="0" step="1" inputmode="numeric" placeholder="Ex: 6" value="">
+              <div class="hint">Entrega = ${money(state.taxas.entrega_base)} + ${money(state.taxas.entrega_km)}/km. Deixe 0 se for retirar.</div>
+            </div>
+            <div class="field">
+              <label class="lbl">Endereço do evento</label>
+              <input type="text" id="endereco" placeholder="Rua, número, bairro">
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>3. Seus dados</h3>
+            <div class="row2">
+              <div class="field"><label class="lbl">Seu nome</label><input type="text" id="nome" placeholder="Nome completo"></div>
+              <div class="field"><label class="lbl">WhatsApp</label><input type="tel" id="whatsapp" placeholder="(11) 99999-8888" inputmode="tel"></div>
+            </div>
+            <div class="field">
+              <label class="lbl">Forma de pagamento</label>
+              <div class="opts">
+                <label class="opt on" data-metodo="pix"><span class="dot"></span><span>💠 Pix (na hora)</span></label>
+                <label class="opt" data-metodo="mercadopago"><span class="dot"></span><span>💳 Cartão / Mercado Pago</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card summary">
+          <h3>Resumo</h3>
+          <div class="sumline"><span class="muted">Kit</span><span>${money(k.preco_locacao)}</span></div>
+          <div class="sumline"><span class="muted">Data</span><span id="sumData">—</span></div>
+          <div class="sumline"><span class="muted">Entrega</span><span id="sumEntrega">${money(0)}</span></div>
+          <div class="sumline"><span class="muted">Montagem</span><span id="sumMontagem">${money(0)}</span></div>
+          <div class="sumline total"><span>Total</span><span id="sumTotal">${money(k.preco_locacao)}</span></div>
+          <button class="btn-primary" id="confirmar" style="margin-top:14px" disabled>Escolha uma data</button>
+          <div class="hint" style="text-align:center;margin-top:8px">Você confirma o pagamento na próxima tela.</div>
+        </div>
+      </div>`;
+
+    document.getElementById('back').onclick = renderCatalog;
+    renderCalendar();
+    document.getElementById('periodo').onchange = e => state.periodo = e.target.value;
+    document.getElementById('tgMontagem').onclick = (e) => { state.montagem = !state.montagem; e.currentTarget.classList.toggle('on', state.montagem); updateTotals(); };
+    document.getElementById('distancia').oninput = e => { state.distancia = Math.max(0, Number(e.target.value)||0); updateTotals(); };
+    main.querySelectorAll('.opt[data-metodo]').forEach(o => o.onclick = () => {
+      state.metodo = o.dataset.metodo;
+      main.querySelectorAll('.opt[data-metodo]').forEach(x => x.classList.toggle('on', x===o));
+    });
+    document.getElementById('confirmar').onclick = submitReserva;
+    updateTotals();
+  }
+
+  function renderCalendar(){
+    const cur = state.calCursor;
+    const y = cur.getFullYear(), m = cur.getMonth();
+    const first = new Date(y, m, 1);
+    const startDow = first.getDay();
+    const daysInMonth = new Date(y, m+1, 0).getDate();
+    const monthName = cur.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    const today = new Date(); today.setHours(0,0,0,0);
+    const minDate = new Date(today); minDate.setDate(minDate.getDate() + state.antecedencia);
+
+    const dow = ['D','S','T','Q','Q','S','S'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+    let cells = '';
+    for (let i=0;i<startDow;i++) cells += `<div class="cal-day empty"></div>`;
+    for (let d=1; d<=daysInMonth; d++){
+      const date = new Date(y, m, d);
+      const iso = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const past = date < minDate;
+      const off = state.indisponiveis.has(iso);
+      const sel = state.data === iso;
+      let cls = 'cal-day ';
+      if (past || off) cls += 'off';
+      else cls += 'free' + (sel ? ' sel' : '');
+      cells += `<div class="${cls}" ${(!past && !off) ? `data-date="${iso}"` : ''}>${d}</div>`;
+    }
+    document.getElementById('cal').innerHTML = `
+      <div class="cal-head">
+        <button class="cal-nav" id="calPrev">‹</button>
+        <strong>${monthName}</strong>
+        <button class="cal-nav" id="calNext">›</button>
+      </div>
+      <div class="cal-grid">${dow}${cells}</div>`;
+    document.getElementById('calPrev').onclick = () => { state.calCursor = new Date(y, m-1, 1); renderCalendar(); };
+    document.getElementById('calNext').onclick = () => { state.calCursor = new Date(y, m+1, 1); renderCalendar(); };
+    document.querySelectorAll('#cal [data-date]').forEach(el => el.onclick = () => {
+      state.data = el.dataset.date; renderCalendar(); updateTotals();
+    });
+  }
+
+  function calcEntrega(){ return state.distancia > 0 ? (state.taxas.entrega_base + state.taxas.entrega_km * state.distancia) : 0; }
+  function calcMontagem(){ return state.montagem ? state.taxas.montagem : 0; }
+  function calcTotal(){ return (Number(state.kit.preco_locacao)||0) + calcEntrega() + calcMontagem(); }
+
+  function updateTotals(){
+    const entrega = calcEntrega(), montagem = calcMontagem(), total = calcTotal();
+    document.getElementById('sumEntrega').textContent = money(entrega);
+    document.getElementById('sumMontagem').textContent = money(montagem);
+    document.getElementById('sumTotal').textContent = money(total);
+    const dataEl = document.getElementById('sumData');
+    dataEl.textContent = state.data ? new Date(state.data+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    const btn = document.getElementById('confirmar');
+    if (!state.data) { btn.disabled = true; btn.textContent = 'Escolha uma data'; }
+    else { btn.disabled = false; btn.textContent = `Reservar • ${money(total)}`; }
+  }
+
+  // ── Enviar reserva ───────────────────────────────────────────
+  async function submitReserva(){
+    const nome = (document.getElementById('nome').value||'').trim();
+    const whatsapp = (document.getElementById('whatsapp').value||'').replace(/\D/g,'');
+    const endereco = (document.getElementById('endereco').value||'').trim();
+    if (!state.data) return toast('Escolha uma data.');
+    if (nome.length < 2) return toast('Informe seu nome.');
+    if (whatsapp.length < 10) return toast('Informe um WhatsApp válido com DDD.');
+    if (state.distancia > 0 && !endereco) return toast('Informe o endereço para entrega.');
+
+    const btn = document.getElementById('confirmar');
+    btn.disabled = true; btn.innerHTML = '<span class="spin" style="width:16px;height:16px;border-width:2px"></span> Reservando…';
+
+    const payload = {
+      kit_id: state.kit.id, data_evento: state.data, periodo: state.periodo,
+      cliente_nome: nome, cliente_whatsapp: whatsapp, endereco,
+      distancia_km: state.distancia, quer_montagem: state.montagem, metodo_pagamento: state.metodo
+    };
+    try {
+      const res = await fetch(API(CFG.ENDPOINTS.reserva), {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!data.ok) { toast(data.erro || 'Não foi possível reservar.'); btn.disabled=false; updateTotals(); return; }
+      renderPayment(data);
+    } catch (e) {
+      toast('Falha de conexão. Tente de novo.');
+      btn.disabled = false; updateTotals();
+    }
+  }
+
+  // ── Pagamento ────────────────────────────────────────────────
+  function renderPayment(data){
+    if (data.pagamento && data.pagamento.tipo === 'mercadopago' && data.pagamento.init_point){
+      main.innerHTML = `<div class="pay-wrap"><div class="pay-emoji">💳</div>
+        <h2 style="margin:8px 0">Quase lá!</h2>
+        <p class="lead">Reserva <b>${esc(data.reserva_id)}</b> criada. Conclua o pagamento no Mercado Pago.</p>
+        <a href="${esc(data.pagamento.init_point)}"><button class="btn-primary">Ir para o pagamento (${money(data.valor_total)})</button></a>
+        <p class="hint" style="margin-top:12px">Sua data fica reservada. Assim que o pagamento é aprovado, você recebe a confirmação no WhatsApp.</p>
+      </div>`;
+      setTimeout(()=>{ window.location.href = data.pagamento.init_point; }, 1200);
+      return;
+    }
+    // Pix
+    const p = data.pagamento || {};
+    const r = data.resumo || {};
+    main.innerHTML = `<div class="pay-wrap">
+      <div class="pay-emoji">💠</div>
+      <h2 style="margin:8px 0">Pague com Pix pra confirmar</h2>
+      <p class="lead">Reserva <b>${esc(data.reserva_id)}</b> — ${esc(r.kit_nome||'')} em ${esc(new Date((r.data_evento||state.data)+'T00:00:00').toLocaleDateString('pt-BR'))}</p>
+      <div class="card" style="text-align:left">
+        <div class="sumline total" style="border:none;margin:0;padding:0 0 6px"><span>Total</span><span>${money(data.valor_total)}</span></div>
+        <div style="font-weight:700;font-size:13px;margin:6px 0 4px">Pix Copia e Cola</div>
+        <div class="pix-code" id="pixCode">${esc(p.pix_copia_cola||'')}</div>
+        <button class="btn-copy" id="copyPix">Copiar código Pix</button>
+        <ol class="steps" style="margin-top:14px">
+          <li>Abra o app do seu banco e escolha <b>Pix › Copia e Cola</b>.</li>
+          <li>Cole o código e confirme o valor de ${money(data.valor_total)}.</li>
+          <li>Pronto! A confirmação chega no seu WhatsApp.</li>
+        </ol>
+      </div>
+      <button class="btn-wa" id="waBtn" style="margin-top:12px"><span>📲</span> Enviar comprovante no WhatsApp</button>
+      <button class="btn-ghost" style="width:100%;margin-top:10px" onclick="location.reload()">Voltar ao início</button>
+    </div>`;
+    document.getElementById('copyPix').onclick = async () => {
+      try { await navigator.clipboard.writeText(p.pix_copia_cola||''); toast('Código Pix copiado ✅'); }
+      catch(e){ const el=document.getElementById('pixCode'); const rg=document.createRange(); rg.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(rg); toast('Selecionado — toque em copiar'); }
+    };
+    const waNum = CFG.WHATSAPP_CONTATO || '';
+    const waMsg = encodeURIComponent(`Olá! Fiz a reserva ${data.reserva_id} (${r.kit_nome||''}) e vou enviar o comprovante do Pix de ${money(data.valor_total)}.`);
+    document.getElementById('waBtn').onclick = () => window.open(`https://wa.me/${waNum}?text=${waMsg}`, '_blank');
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
