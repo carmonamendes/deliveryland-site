@@ -59,7 +59,7 @@ async function request<T>(path: string, options: RequestInit = {}, useAuth = fal
   return data as T;
 }
 
-export const isApiConfigured = () => !/SUA_API|localhost/.test(API_BASE);
+export const isApiConfigured = () => !!API_BASE && !/SUA_API/.test(API_BASE);
 
 // ── Público ────────────────────────────────────────────────────
 export const getCatalogo = () => request<Catalogo>('/catalogo');

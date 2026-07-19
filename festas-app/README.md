@@ -1,18 +1,20 @@
-# Festas App — SPA de locação de kits (React + Vite)
+# Ateliê Abelhinha — SPA de locação de kits (React + Vite)
 
-Frontend do sistema de locação de kits de festa. Fala com a **Festas API**
-(repositório `prevent-n8n-pack`, pasta `festas-api/`).
+Frontend do sistema de locação de kits de festa do **Ateliê Abelhinha**. Fala com
+a **Festas API** (repositório `prevent-n8n-pack`, pasta `festas-api/`).
 
+- **Domínio:** `https://atelieabelhinha.com.br` (SPA na raiz).
 - **Código-fonte:** esta pasta (`festas-app/`).
-- **Build publicado:** sai em `../festas` (servido pelo GitHub Pages em
-  `https://deliveryland.com.br/festas/`). O build já vai versionado no repositório.
+- **Build:** sai em `../festas` (artefato versionado). Publique o conteúdo dessa
+  pasta no docroot da VPS que atende o domínio. Guia completo em
+  `prevent-n8n-pack/festas-api/DEPLOY.md`.
 
 ## Rodar em desenvolvimento
 
 ```bash
 cd festas-app
 npm install
-npm run dev        # http://localhost:5173/festas/
+npm run dev        # http://localhost:5173/
 ```
 
 Aponte a API criando `festas-app/.env.local` com:
@@ -31,11 +33,11 @@ Faça commit da pasta `../festas` gerada. O GitHub Pages serve os arquivos.
 
 ## Configurar a URL da API em produção
 
-A URL da API é lida em **runtime** de `festas/festas-config.js` (não precisa
-rebuildar para trocar):
+A URL da API é lida em **runtime** de `festas-config.js` (na raiz do site; não
+precisa rebuildar para trocar):
 
 ```js
-window.__FESTAS_API__ = "https://api.seudominio.com.br";
+window.__FESTAS_API__ = "https://api.atelieabelhinha.com.br";
 ```
 
 ## Estrutura

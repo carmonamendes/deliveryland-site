@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-export function Header({ nome = 'Kit Festas & Arcos' }: { nome?: string }) {
+export function Header({ nome = 'Ateliê Abelhinha' }: { nome?: string }) {
   return (
     <header className="app-header">
       <div className="container">

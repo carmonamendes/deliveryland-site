@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// O app é servido em https://deliveryland.com.br/festas/
-// O build sai em ../festas (raiz do site GitHub Pages).
+// O app é servido na RAIZ do domínio próprio: https://atelieabelhinha.com.br
+// O build sai em ../festas (artefato versionado; publique o conteúdo no
+// docroot da VPS que atende atelieabelhinha.com.br).
 export default defineConfig({
   plugins: [react()],
-  base: '/festas/',
+  base: '/',
   build: {
     outDir: '../festas',
     emptyOutDir: true,
