@@ -129,7 +129,20 @@ def main():
         chk(st == 200 and rr.get(campo) is True and bool(rr.get(campo + "_em")),
             f"checklist {campo} = true + {campo}_em gravado (got {st})")
 
-    # 6. limpeza: cancelar a reserva de teste
+    # 6. cobrança / termo de confissão de dívida
+    st, d = req("POST", f"/admin/reservas/{reserva_id}/cobrancas", token=token,
+                body={"valor": 350, "descricao": "SMOKE dano de teste (apagar)", "prazo_dias": 5})
+    cid = (d or {}).get("cobranca", {}).get("id")
+    chk(st in (200, 201) and cid, f"POST cobrança gera confissão de dívida (got {st})")
+    if cid:
+        st, d = req("GET", f"/admin/cobrancas/{cid}", token=token)
+        chk(st == 200 and float((d or {}).get("cobranca", {}).get("valor", 0)) == 350.0, "GET documento da cobrança (valor confere)")
+        chk(bool((d or {}).get("reserva", {}).get("cliente_nome")), "documento traz dados do devedor/termo")
+        st, d = req("PATCH", f"/admin/cobrancas/{cid}", token=token, body={"status": "PAGO"})
+        chk(st == 200 and (d or {}).get("cobranca", {}).get("status") == "PAGO", "PATCH marca cobrança como paga")
+        req("PATCH", f"/admin/cobrancas/{cid}", token=token, body={"status": "CANCELADO"})
+
+    # 7. limpeza: cancelar a reserva de teste
     st, _ = req("POST", f"/admin/reservas/{reserva_id}/cancelar", token=token)
     chk(st == 200, f"reserva de teste cancelada (limpeza) (got {st})")
 
