@@ -132,12 +132,29 @@ def main():
     # 6. cobrança / termo de confissão de dívida
     st, d = req("POST", f"/admin/reservas/{reserva_id}/cobrancas", token=token,
                 body={"valor": 350, "descricao": "SMOKE dano de teste (apagar)", "prazo_dias": 5})
-    cid = (d or {}).get("cobranca", {}).get("id")
+    cob = (d or {}).get("cobranca", {})
+    cid = cob.get("id")
+    ctoken = cob.get("token")
     chk(st in (200, 201) and cid, f"POST cobrança gera confissão de dívida (got {st})")
+    chk(bool(ctoken), "cobrança traz token do link de assinatura")
     if cid:
         st, d = req("GET", f"/admin/cobrancas/{cid}", token=token)
         chk(st == 200 and float((d or {}).get("cobranca", {}).get("valor", 0)) == 350.0, "GET documento da cobrança (valor confere)")
         chk(bool((d or {}).get("reserva", {}).get("cliente_nome")), "documento traz dados do devedor/termo")
+    if ctoken:
+        # Fluxo público de assinatura online do devedor
+        st, d = req("GET", f"/confissao/{ctoken}")
+        chk(st == 200 and (d or {}).get("confissao", {}).get("cliente_nome"), "GET confissão pública pelo token")
+        chk((d or {}).get("confissao", {}).get("assinado") is False, "confissão começa não assinada")
+        st, d = req("POST", f"/confissao/{ctoken}/assinar", body={"assinatura": ASSINATURA})
+        chk(st == 200, f"devedor assina a confissão online (got {st})")
+        st, d = req("POST", f"/confissao/{ctoken}/assinar", body={"assinatura": ASSINATURA})
+        chk(st == 400, f"segunda assinatura é rejeitada (got {st})")
+        st, d = req("GET", f"/admin/cobrancas/{cid}", token=token)
+        cc = (d or {}).get("cobranca", {})
+        chk(cc.get("assinado") is True and str(cc.get("assinatura_img", "")).startswith("data:image/"), "cobrança fica assinada com a imagem do devedor")
+        chk(len(str(cc.get("doc_hash", ""))) == 64, "doc_hash SHA-256 do documento gravado")
+    if cid:
         st, d = req("PATCH", f"/admin/cobrancas/{cid}", token=token, body={"status": "PAGO"})
         chk(st == 200 and (d or {}).get("cobranca", {}).get("status") == "PAGO", "PATCH marca cobrança como paga")
         req("PATCH", f"/admin/cobrancas/{cid}", token=token, body={"status": "CANCELADO"})
