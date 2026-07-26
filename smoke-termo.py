@@ -118,6 +118,7 @@ def main():
     chk(len("".join(filter(str.isdigit, str(r.get("cliente_cpf", ""))))) == 11, "cliente_cpf armazenado")
     # Caminho B: título executivo — testemunhas, hash e valor de reposição
     chk(len(str(r.get("termo_hash", ""))) == 64, f"termo_hash SHA-256 gravado (len {len(str(r.get('termo_hash','')))})")
+    chk(bool(r.get("responsavel_nome")), f"responsável pelo contrato gravado (= {r.get('responsavel_nome')})")
     chk(bool(r.get("testemunha1_nome")), f"testemunha 1 gravada (= {r.get('testemunha1_nome')})")
     chk(bool(r.get("testemunha2_nome")), f"testemunha 2 gravada (= {r.get('testemunha2_nome')})")
     chk(float(r.get("valor_reposicao", 0) or 0) >= 0, "valor_reposicao presente no termo")
