@@ -88,6 +88,19 @@ def main():
         st, _ = req("POST", f"/admin/reservas/{rid}/cancelar", token=token)
         chk(st == 200, "pedido de teste cancelado (limpeza)")
 
+    # Admin: CRUD do catálogo
+    if token:
+        st, d = req("POST", "/admin/produtos", token=token, body={"tipo": "EXTRA", "nome": "SMOKE Produto (apagar)", "descricao": "teste", "preco": 10, "ativo": True})
+        pid = (d or {}).get("produto", {}).get("id")
+        chk(st in (200, 201) and pid, f"admin cria produto no catálogo (got {st})")
+        if pid:
+            st, c2 = req("GET", "/montador/catalogo")
+            chk(any(p.get("id") == pid for p in (c2 or {}).get("produtos", [])), "produto novo aparece no catálogo público")
+            st, _ = req("PATCH", f"/admin/produtos/{pid}", token=token, body={"preco": 15})
+            chk(st == 200, "admin edita produto")
+            st, _ = req("DELETE", f"/admin/produtos/{pid}", token=token)
+            chk(st == 200, "admin exclui produto (limpeza)")
+
     print(f"\n== Resultado: {ok} PASS / {fail} FAIL ==")
     sys.exit(0 if fail == 0 else 1)
 
