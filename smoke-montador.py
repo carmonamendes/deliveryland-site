@@ -88,10 +88,17 @@ def main():
         st, _ = req("POST", f"/admin/reservas/{rid}/cancelar", token=token)
         chk(st == 200, "pedido de teste cancelado (limpeza)")
 
-    # Admin: CRUD do catálogo
+    # Admin: relatório de lucratividade unificado
     if token:
-        st, d = req("POST", "/admin/produtos", token=token, body={"tipo": "EXTRA", "nome": "SMOKE Produto (apagar)", "descricao": "teste", "preco": 10, "ativo": True})
+        st, d = req("GET", "/admin/produtos/relatorio", token=token)
+        chk(st == 200 and isinstance((d or {}).get("itens"), list), f"relatório de lucratividade responde (got {st})")
+        chk("investido" in (d or {}).get("totais", {}), "relatório traz totais (investido/receita/lucro)")
+
+    # Admin: CRUD do catálogo (com custo e estoque unificados)
+    if token:
+        st, d = req("POST", "/admin/produtos", token=token, body={"tipo": "EXTRA", "nome": "SMOKE Produto (apagar)", "descricao": "teste", "preco": 10, "preco_aquisicao": 40, "estoque": 3, "ativo": True})
         pid = (d or {}).get("produto", {}).get("id")
+        chk(float((d or {}).get("produto", {}).get("preco_aquisicao", 0)) == 40.0 and (d or {}).get("produto", {}).get("estoque") == 3, "produto guarda custo e estoque")
         chk(st in (200, 201) and pid, f"admin cria produto no catálogo (got {st})")
         if pid:
             st, c2 = req("GET", "/montador/catalogo")
